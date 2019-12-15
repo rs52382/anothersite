@@ -1,0 +1,251 @@
+---
+title: "Project 1: Exploratory Data Analysis"
+author: "Raj Sharan - rs52382"
+date: "10/20/2019"
+output: html_document
+---
+
+
+
+<hr />
+<div id="introduction" class="section level3">
+<h3>0. Introduction</h3>
+<div id="i-have-chosen-two-datasets-provided-by-the-fivethirtyeight-package.-the-first-dataset-labeled-bad_drivers-lists-data-from-all-50-u.s.-states-and-the-district-of-columbia.-the-dataset-contains-several-numerical-variables-on-the-number-of-drivers-per-state-involved-in-fatal-collisions-per-billion-miles-num_drivers-the-percentage-of-drivers-involved-in-fatal-collisions-who-were-speeding-perc_speeding-the-percentage-of-drivers-involved-in-fatal-collisions-who-were-alcohol-impaired-perc_alcohol-the-percentage-of-drivers-involved-in-fatal-collisions-who-were-not-distracted-perc_not_distracted-the-percentage-of-drivers-involved-in-fatal-collisions-who-had-not-been-involved-in-any-previous-accidents-perc_no_previous-car-insurance-premiums-in-u.s.-dollars-insurance_premiums-and-losses-incurred-by-insurance-companies-for-collisions-per-insured-driver-in-u.s.-dollars-losses." class="section level5">
+<h5>I have chosen two datasets provided by the FiveThirtyEight package. The first dataset labeled <code>bad_drivers</code> lists data from all 50 U.S. states and the District of Columbia. The dataset contains several numerical variables on the number of drivers per state involved in fatal collisions per billion miles (<code>num_drivers</code>), the percentage of drivers involved in fatal collisions who were speeding (<code>perc_speeding</code>), the percentage of drivers involved in fatal collisions who were alcohol-impaired (<code>perc_alcohol</code>), the percentage of drivers involved in fatal collisions who were not distracted (<code>perc_not_distracted</code>), the percentage of drivers involved in fatal collisions who had not been involved in any previous accidents (<code>perc_no_previous</code>), car insurance premiums in U.S. dollars (<code>insurance_premiums</code>), and losses incurred by insurance companies for collisions per insured driver in U.S. dollars (<code>losses</code>).</h5>
+</div>
+<div id="the-second-dataset-labeled-state_info-lists-all-50-u.s.-states-and-the-district-of-colombia-in-addition-to-their-abbreviation-division-and-region.-i-was-able-to-aquire-these-datasets-by-installing-the-fivethirtyeight-package-and-pulling-the-datasets-i-needed.-i-was-inspired-to-choose-these-datasets-when-i-was-in-a-car-accident-earlier-this-month.-although-my-accident-was-much-less-severe-i-wanted-to-see-if-there-were-any-correlations-between-fatal-collisions-and-the-regions-or-divisions-of-the-u.s.." class="section level5">
+<h5>The second dataset labeled <code>state_info</code> lists all 50 U.S. states and the District of Colombia in addition to their abbreviation, division, and region. I was able to aquire these datasets by installing the <code>fivethirtyeight</code> package and pulling the datasets I needed. I was inspired to choose these datasets when I was in a car accident earlier this month. Although my accident was much less severe, I wanted to see if there were any correlations between fatal collisions and the regions or divisions of the U.S..</h5>
+<hr />
+</div>
+</div>
+<div id="tidying-rearranging-widelong" class="section level3">
+<h3>1. Tidying: Rearranging Wide/Long</h3>
+<div id="my-datasets-were-already-tidy-so-i-untidied-them-by-using-pivot_wider-on-each-dataset-and-then-reshaped-them-with-pivot_longer-to-retidy-them.-i-made-sure-to-ue-values_drop_nat-in-when-retidying-each-dataset-so-as-to-remove-any-nas-from-the-datasets." class="section level5">
+<h5>My datasets were already tidy, so I untidied them by using <code>pivot_wider</code> on each dataset and then reshaped them with <code>pivot_longer</code> to retidy them. I made sure to ue <code>values_drop_na=T</code> in when retidying each dataset so as to remove any NAs from the datasets.</h5>
+<pre><code>## Observations: 51
+## Variables: 6
+## $ state        &lt;chr&gt; &quot;Alabama&quot;, &quot;Alaska&quot;, &quot;Arizona&quot;, &quot;Arkansas&quot;, &quot;California&quot;…
+## $ state_abbrev &lt;chr&gt; &quot;AL&quot;, &quot;AK&quot;, &quot;AZ&quot;, &quot;AR&quot;, &quot;CA&quot;, &quot;CO&quot;, &quot;CT&quot;, &quot;DE&quot;, &quot;FL&quot;, &quot;G…
+## $ South        &lt;chr&gt; &quot;East South Central&quot;, NA, NA, &quot;West South Central&quot;, NA, …
+## $ West         &lt;chr&gt; NA, &quot;Pacific&quot;, &quot;Mountain&quot;, NA, &quot;Pacific&quot;, &quot;Mountain&quot;, NA…
+## $ Northeast    &lt;chr&gt; NA, NA, NA, NA, NA, NA, &quot;New England&quot;, NA, NA, NA, NA, N…
+## $ Midwest      &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, &quot;East No…</code></pre>
+<pre><code>## Observations: 51
+## Variables: 4
+## $ state        &lt;chr&gt; &quot;Alabama&quot;, &quot;Alaska&quot;, &quot;Arizona&quot;, &quot;Arkansas&quot;, &quot;California&quot;…
+## $ state_abbrev &lt;chr&gt; &quot;AL&quot;, &quot;AK&quot;, &quot;AZ&quot;, &quot;AR&quot;, &quot;CA&quot;, &quot;CO&quot;, &quot;CT&quot;, &quot;DE&quot;, &quot;FL&quot;, &quot;G…
+## $ region       &lt;chr&gt; &quot;South&quot;, &quot;West&quot;, &quot;West&quot;, &quot;South&quot;, &quot;West&quot;, &quot;West&quot;, &quot;North…
+## $ division     &lt;chr&gt; &quot;East South Central&quot;, &quot;Pacific&quot;, &quot;Mountain&quot;, &quot;West South…</code></pre>
+<pre><code>## Observations: 51
+## Variables: 8
+## $ perc_speeding       &lt;int&gt; 39, 41, 35, 18, 35, 37, 46, 38, 34, 21, 19, 54, 3…
+## $ perc_alcohol        &lt;int&gt; 30, 25, 28, 26, 28, 28, 36, 30, 27, 29, 25, 41, 2…
+## $ perc_not_distracted &lt;int&gt; 96, 90, 84, 94, 91, 79, 87, 87, 100, 92, 95, 82, …
+## $ perc_no_previous    &lt;int&gt; 80, 94, 96, 95, 89, 95, 82, 99, 100, 94, 93, 87, …
+## $ insurance_premiums  &lt;dbl&gt; 784.55, 1053.48, 899.47, 827.34, 878.41, 835.50, …
+## $ losses              &lt;dbl&gt; 145.08, 133.93, 110.35, 142.39, 165.63, 139.91, 1…
+## $ state               &lt;chr&gt; &quot;Alabama&quot;, &quot;Alaska&quot;, &quot;Arizona&quot;, &quot;Arkansas&quot;, &quot;Cali…
+## $ num_drivers         &lt;dbl&gt; 18.8, 18.1, 18.6, 22.4, 12.0, 13.6, 10.8, 16.2, 5…</code></pre>
+<hr />
+</div>
+</div>
+<div id="joiningmerging" class="section level3">
+<h3>2. Joining/Merging</h3>
+<div id="i-joined-my-two-datasets-by-using-left_join-to-join-the-bad_drivers-dataset-to-the-state_info-dataset.-i-chose-left_join-instead-of-another-join-function-so-as-to-keep-the-state-state-abbreviation-division-and-region-variables-on-the-left-side-of-the-dataset-and-keep-the-dataset-looking-clean.-no-cases-were-dropped-since-the-datasets-were-joined-by-state-and-all-51-locations-were-in-each-dataset." class="section level5">
+<h5>I joined my two datasets by using <code>left_join</code> to join the <code>bad_drivers</code> dataset to the <code>state_info</code> dataset. I chose <code>left_join</code> instead of another join function so as to keep the state, state abbreviation, division, and region variables on the left side of the dataset and keep the dataset looking clean. No cases were dropped since the datasets were joined by <code>state</code> and all 51 locations were in each dataset.</h5>
+<pre><code>## Observations: 51
+## Variables: 11
+## $ state               &lt;chr&gt; &quot;Alabama&quot;, &quot;Alaska&quot;, &quot;Arizona&quot;, &quot;Arkansas&quot;, &quot;Cali…
+## $ state_abbrev        &lt;chr&gt; &quot;AL&quot;, &quot;AK&quot;, &quot;AZ&quot;, &quot;AR&quot;, &quot;CA&quot;, &quot;CO&quot;, &quot;CT&quot;, &quot;DE&quot;, &quot;…
+## $ region              &lt;chr&gt; &quot;South&quot;, &quot;West&quot;, &quot;West&quot;, &quot;South&quot;, &quot;West&quot;, &quot;West&quot;,…
+## $ division            &lt;chr&gt; &quot;East South Central&quot;, &quot;Pacific&quot;, &quot;Mountain&quot;, &quot;Wes…
+## $ perc_speeding       &lt;int&gt; 39, 41, 35, 18, 35, 37, 46, 38, 21, 19, 54, 36, 3…
+## $ perc_alcohol        &lt;int&gt; 30, 25, 28, 26, 28, 28, 36, 30, 29, 25, 41, 29, 3…
+## $ perc_not_distracted &lt;int&gt; 96, 90, 84, 94, 91, 79, 87, 87, 92, 95, 82, 85, 9…
+## $ perc_no_previous    &lt;int&gt; 80, 94, 96, 95, 89, 95, 82, 99, 94, 93, 87, 98, 9…
+## $ insurance_premiums  &lt;dbl&gt; 784.55, 1053.48, 899.47, 827.34, 878.41, 835.50, …
+## $ losses              &lt;dbl&gt; 145.08, 133.93, 110.35, 142.39, 165.63, 139.91, 1…
+## $ num_drivers         &lt;dbl&gt; 18.8, 18.1, 18.6, 22.4, 12.0, 13.6, 10.8, 16.2, 1…</code></pre>
+<hr />
+</div>
+</div>
+<div id="wrangling" class="section level3">
+<h3>3. Wrangling</h3>
+<div id="the-mean-values-for-all-numeric-variables-are-as-follows-15.7902-people-for-num_drivers-31.72549-for-perc_speeding-30.68627-for-perc_alcohol-85.92157-for-perc_not_distracted-88.72549-for-perc_no_previous-886.9576-for-insurance_premiums-and-134.4931-for-losses." class="section level5">
+<h5>The mean values for all numeric variables are as follows: 15.7902 people for <code>num_drivers</code>, 31.72549% for <code>perc_speeding</code>, 30.68627% for <code>perc_alcohol</code>, 85.92157% for <code>perc_not_distracted</code>, 88.72549% for <code>perc_no_previous</code>, $886.9576 for <code>insurance_premiums</code>, and $134.4931 for <code>losses</code>.</h5>
+</div>
+<div id="the-standard-deviation-values-for-all-numeric-variables-are-as-follows-4.122002-people-for-num_drivers-9.633438-for-perc_speeding-5.132213-for-perc_alcohol-15.15895-for-perc_not_distracted-6.96011-for-perc_no_previous-178.2963-for-insurance_premiums-and-24.83592-for-losses." class="section level5">
+<h5>The standard deviation values for all numeric variables are as follows: 4.122002 people for <code>num_drivers</code>, 9.633438% for <code>perc_speeding</code>, 5.132213% for <code>perc_alcohol</code>, 15.15895% for <code>perc_not_distracted</code>, 6.96011% for <code>perc_no_previous</code>, $178.2963 for <code>insurance_premiums</code>, and $24.83592 for <code>losses</code>.</h5>
+</div>
+<div id="the-variance-values-for-all-numeric-variables-are-as-follows-16.9909-for-num_drivers-92.80314-for-perc_speeding-26.33961-for-perc_alcohol-229.7937-for-perc_not_distracted-48.44314-for-perc_no_previous-31789.57-for-insurance_premiums-and-616.823-for-losses." class="section level5">
+<h5>The variance values for all numeric variables are as follows: 16.9909 for <code>num_drivers</code>, 92.80314 for <code>perc_speeding</code>, 26.33961 for <code>perc_alcohol</code>, 229.7937 for <code>perc_not_distracted</code>, 48.44314 for <code>perc_no_previous</code>, 31789.57 for <code>insurance_premiums</code>, and 616.823 for <code>losses</code>.</h5>
+</div>
+<div id="the-minimum-values-for-all-numeric-variables-are-as-follows-5.9-people-for-num_drivers-13-for-perc_speeding-16-for-perc_alcohol-10-for-perc_not_distracted-76-for-perc_no_previous-641.96-for-insurance_premiums-and-82.75-for-losses." class="section level5">
+<h5>The minimum values for all numeric variables are as follows: 5.9 people for <code>num_drivers</code>, 13% for <code>perc_speeding</code>, 16% for <code>perc_alcohol</code>, 10% for <code>perc_not_distracted</code>, 76% for <code>perc_no_previous</code>, $641.96 for <code>insurance_premiums</code>, and $82.75 for <code>losses</code>.</h5>
+</div>
+<div id="the-maximum-values-for-all-numeric-variables-are-as-follows-23.9-people-for-num_drivers-54-for-perc_speeding-44-for-perc_alcohol-100-for-perc_not_distracted-100-for-perc_no_previous-1301.52-for-insurance_premiums-and-194.78-for-losses." class="section level5">
+<h5>The maximum values for all numeric variables are as follows: 23.9 people for <code>num_drivers</code>, 54% for <code>perc_speeding</code>, 44% for <code>perc_alcohol</code>, 100% for <code>perc_not_distracted</code>, 100% for <code>perc_no_previous</code>, $1301.52 for <code>insurance_premiums</code>, and $194.78 for <code>losses</code>.</h5>
+</div>
+<div id="the-number-of-distinct-values-for-all-numeric-variables-are-as-follows-45-for-num_drivers-29-for-perc_speeding-19-for-perc_alcohol-26-for-perc_not_distracted-22-for-perc_no_previous-51-for-insurance_premiums-and-51-for-losses." class="section level5">
+<h5>The number of distinct values for all numeric variables are as follows: 45 for <code>num_drivers</code>, 29 for <code>perc_speeding</code>, 19 for <code>perc_alcohol</code>, 26 for <code>perc_not_distracted</code>, 22 for <code>perc_no_previous</code>, 51 for <code>insurance_premiums</code>, and 51 for <code>losses</code>.</h5>
+</div>
+<div id="the-correlation-matrix-created-for-all-numeric-variables-shows-the-strongest-correlation-at-0.286-for-the-percentage-of-drivers-involved-in-fatal-collisions-who-were-speeding-perc_speeding-and-the-percentage-of-drivers-involved-in-fatal-collisions-who-were-alcohol-impaired-perc_alcohol.-out-of-all-4-regions-of-the-u.s.-the-south-has-the-largest-mean-and-standard-deviation-for-the-number-of-drivers-per-state-involved-in-fatal-collisions-per-billion-miles.-out-of-the-3-divisions-located-in-the-south-the-west-south-central-division-has-the-largest-mean-for-the-number-of-drivers-per-state-involved-in-fatal-collisions-per-billion-miles.-south-carolina-ranks-the-highest-in-the-99th-percentile-for-the-number-of-drivers-per-state-involved-in-fatal-collisions-per-billion-miles-while-the-district-of-columbia-ranks-the-lowest-in-the-1st-percentile." class="section level5">
+<h5>The correlation matrix created for all numeric variables shows the strongest correlation at 0.286 for the percentage of drivers involved in fatal collisions who were speeding (<code>perc_speeding</code>) and the percentage of drivers involved in fatal collisions who were alcohol-impaired (<code>perc_alcohol</code>). Out of all 4 regions of the U.S., the South has the largest mean and standard deviation for the number of drivers per state involved in fatal collisions per billion miles. Out of the 3 divisions located in the South, the West South Central division has the largest mean for the number of drivers per state involved in fatal collisions per billion miles. South Carolina ranks the highest in the 99th percentile for the number of drivers per state involved in fatal collisions per billion miles, while the District of Columbia ranks the lowest in the 1st percentile.</h5>
+<pre><code>## # A tibble: 1 x 7
+##   perc_speeding perc_alcohol perc_not_distra… perc_no_previous insurance_premi…
+##           &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1          31.7         30.7             85.9             88.7             887.
+## # … with 2 more variables: losses &lt;dbl&gt;, num_drivers &lt;dbl&gt;</code></pre>
+<pre><code>## # A tibble: 1 x 7
+##   perc_speeding perc_alcohol perc_not_distra… perc_no_previous insurance_premi…
+##           &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1          9.63         5.13             15.2             6.96             178.
+## # … with 2 more variables: losses &lt;dbl&gt;, num_drivers &lt;dbl&gt;</code></pre>
+<pre><code>## # A tibble: 1 x 7
+##   perc_speeding perc_alcohol perc_not_distra… perc_no_previous insurance_premi…
+##           &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1          92.8         26.3             230.             48.4           31790.
+## # … with 2 more variables: losses &lt;dbl&gt;, num_drivers &lt;dbl&gt;</code></pre>
+<pre><code>## # A tibble: 1 x 7
+##   perc_speeding perc_alcohol perc_not_distra… perc_no_previous insurance_premi…
+##           &lt;int&gt;        &lt;int&gt;            &lt;int&gt;            &lt;int&gt;            &lt;dbl&gt;
+## 1            13           16               10               76             642.
+## # … with 2 more variables: losses &lt;dbl&gt;, num_drivers &lt;dbl&gt;</code></pre>
+<pre><code>## # A tibble: 1 x 7
+##   perc_speeding perc_alcohol perc_not_distra… perc_no_previous insurance_premi…
+##           &lt;int&gt;        &lt;int&gt;            &lt;int&gt;            &lt;int&gt;            &lt;dbl&gt;
+## 1            54           44              100              100            1302.
+## # … with 2 more variables: losses &lt;dbl&gt;, num_drivers &lt;dbl&gt;</code></pre>
+<pre><code>## # A tibble: 1 x 11
+##   state state_abbrev region division perc_speeding perc_alcohol perc_not_distra…
+##   &lt;int&gt;        &lt;int&gt;  &lt;int&gt;    &lt;int&gt;         &lt;int&gt;        &lt;int&gt;            &lt;int&gt;
+## 1    51           51      4        9            29           19               26
+## # … with 4 more variables: perc_no_previous &lt;int&gt;, insurance_premiums &lt;int&gt;,
+## #   losses &lt;int&gt;, num_drivers &lt;int&gt;</code></pre>
+<pre><code>##                     perc_speeding perc_alcohol perc_not_distracted
+## perc_speeding          1.00000000   0.28624417         0.131737796
+## perc_alcohol           0.28624417   1.00000000         0.043379788
+## perc_not_distracted    0.13173780   0.04337979         1.000000000
+## perc_no_previous       0.01406622  -0.24545506        -0.195264522
+## insurance_premiums     0.04254126  -0.01745071         0.019578112
+## losses                -0.06124052  -0.08391593        -0.058466772
+## num_drivers           -0.02908015   0.19942634         0.009781764
+##                     perc_no_previous insurance_premiums      losses
+## perc_speeding             0.01406622         0.04254126 -0.06124052
+## perc_alcohol             -0.24545506        -0.01745071 -0.08391593
+## perc_not_distracted      -0.19526452         0.01957811 -0.05846677
+## perc_no_previous          1.00000000         0.07553314  0.04277014
+## insurance_premiums        0.07553314         1.00000000  0.62311644
+## losses                    0.04277014         0.62311644  1.00000000
+## num_drivers              -0.01794188        -0.19970195 -0.03601108
+##                      num_drivers
+## perc_speeding       -0.029080146
+## perc_alcohol         0.199426344
+## perc_not_distracted  0.009781764
+## perc_no_previous    -0.017941877
+## insurance_premiums  -0.199701946
+## losses              -0.036011082
+## num_drivers          1.000000000</code></pre>
+<pre><code>## # A tibble: 4 x 8
+##   region perc_speeding perc_alcohol perc_not_distra… perc_no_previous
+##   &lt;chr&gt;          &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1 Midwe…          27.2         31.7             88.8             86.7
+## 2 North…          33.8         31.9             89.6             83.2
+## 3 South           29.1         29.9             84.4             90.2
+## 4 West            37.9         29.9             82.7             92.5
+## # … with 3 more variables: insurance_premiums &lt;dbl&gt;, losses &lt;dbl&gt;,
+## #   num_drivers &lt;dbl&gt;</code></pre>
+<pre><code>## # A tibble: 4 x 8
+##   region perc_speeding perc_alcohol perc_not_distra… perc_no_previous
+##   &lt;chr&gt;          &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1 Midwe…          8.40         4.94            16.8              5.25
+## 2 North…         10.5          3.52             4.03             5.36
+## 3 South           9.18         4.44            21.0              8.11
+## 4 West            7.82         7.03             8.27             4.91
+## # … with 3 more variables: insurance_premiums &lt;dbl&gt;, losses &lt;dbl&gt;,
+## #   num_drivers &lt;dbl&gt;</code></pre>
+<pre><code>## # A tibble: 3 x 8
+##   division perc_speeding perc_alcohol perc_not_distra… perc_no_previous
+##   &lt;chr&gt;            &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1 East So…          23.5         28.2             66.5             84.2
+## 2 South A…          30.7         30               91               91.3
+## 3 West So…          31.2         31.5             87.5             93.5
+## # … with 3 more variables: insurance_premiums &lt;dbl&gt;, losses &lt;dbl&gt;,
+## #   num_drivers &lt;dbl&gt;</code></pre>
+<pre><code>## # A tibble: 51 x 2
+##    state          num_drivers_pct
+##    &lt;chr&gt;                    &lt;int&gt;
+##  1 South Carolina              99
+##  2 North Dakota                97
+##  3 West Virginia               95
+##  4 Arkansas                    93
+##  5 Montana                     91
+##  6 Kentucky                    89
+##  7 Louisiana                   87
+##  8 Oklahoma                    85
+##  9 Tennessee                   83
+## 10 Texas                       81
+## # … with 41 more rows</code></pre>
+<hr />
+</div>
+</div>
+<div id="visualizing" class="section level3">
+<h3>4. Visualizing</h3>
+<p><img src="/project1_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
+<div id="for-the-first-plot-a-scatterplot-was-made-in-order-to-compare-the-two-highest-correlated-variables-by-region-perc_speeding-and-perc_alcohol.-according-to-the-scatterplot-it-can-be-said-that-the-western-region-of-the-u.s.-has-more-of-a-positive-relationship-between-the-percentage-of-drivers-involved-in-fatal-collisions-who-were-speeding-and-the-percentage-of-drivers-involved-in-fatal-collisions-who-were-alcohol-impaired-than-the-other-regions.-the-midwestern-and-northeastern-regions-seem-to-have-no-relationship-at-all-between-the-two-variables-and-the-south-can-be-seen-to-have-a-slightly-positive-relationship-between-the-two-variables." class="section level5">
+<h5>For the first plot, a scatterplot was made in order to compare the two highest correlated variables by <code>region</code>: <code>perc_speeding</code> and <code>perc_alcohol</code>. According to the scatterplot, it can be said that the Western region of the U.S. has more of a positive relationship between the percentage of drivers involved in fatal collisions who were speeding and the percentage of drivers involved in fatal collisions who were alcohol-impaired than the other regions. The Midwestern and Northeastern regions seem to have no relationship at all between the two variables, and the South can be seen to have a slightly positive relationship between the two variables.</h5>
+<p><img src="/project1_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="the-second-plot-consists-of-a-stacked-bar-chart-displaying-the-average-number-of-drivers-per-state-involved-in-fatal-collisions-per-billion-miles-num_drivers-organized-by-region-and-division-within-each-region.-it-is-clear-that-the-southern-region-of-the-u.s.-has-more-drivers-involved-in-fatal-collisions-per-billion-miles-but-it-also-consists-of-3-divisions-rather-than-2-like-the-other-regions-possibly-generating-more-data-for-the-south.-it-can-be-said-that-the-east-south-central-and-west-south-central-divisions-each-compensate-for-more-drivers-involved-in-fatal-collisions-per-billion-miles-than-any-other-division-across-the-u.s.." class="section level5">
+<h5>The second plot consists of a stacked bar chart, displaying the average number of drivers per state involved in fatal collisions per billion miles (<code>num_drivers</code>) organized by <code>region</code> and <code>division</code> within each region. It is clear that the Southern region of the U.S. has more drivers involved in fatal collisions per billion miles, but it also consists of 3 divisions rather than 2 like the other regions, possibly generating more data for the South. It can be said that the East South Central and West South Central divisions each compensate for more drivers involved in fatal collisions per billion miles than any other division across the U.S..</h5>
+<hr />
+</div>
+</div>
+<div id="dimensionality-reduction" class="section level3">
+<h3>5. Dimensionality Reduction</h3>
+<pre><code>##                     perc_speeding perc_alcohol perc_not_distracted
+## perc_speeding                1.00         0.29                0.13
+## perc_alcohol                 0.29         1.00                0.04
+## perc_not_distracted          0.13         0.04                1.00
+## perc_no_previous             0.01        -0.25               -0.20
+## insurance_premiums           0.04        -0.02                0.02
+## losses                      -0.06        -0.08               -0.06
+## num_drivers                 -0.03         0.20                0.01
+##                     perc_no_previous insurance_premiums losses num_drivers
+## perc_speeding                   0.01               0.04  -0.06       -0.03
+## perc_alcohol                   -0.25              -0.02  -0.08        0.20
+## perc_not_distracted            -0.20               0.02  -0.06        0.01
+## perc_no_previous                1.00               0.08   0.04       -0.02
+## insurance_premiums              0.08               1.00   0.62       -0.20
+## losses                          0.04               0.62   1.00       -0.04
+## num_drivers                    -0.02              -0.20  -0.04        1.00</code></pre>
+<pre><code>## [1] &quot;sdev&quot;     &quot;loadings&quot; &quot;center&quot;   &quot;scale&quot;    &quot;n.obs&quot;    &quot;scores&quot;   &quot;call&quot;</code></pre>
+<pre><code>## Importance of components:
+##                           Comp.1    Comp.2    Comp.3    Comp.4    Comp.5
+## Standard deviation     1.3037496 1.1776787 1.0250007 1.0086385 0.9217813
+## Proportion of Variance 0.2476798 0.2020951 0.1530913 0.1482427 0.1238106
+## Cumulative Proportion  0.2476798 0.4497748 0.6028661 0.7511088 0.8749194
+##                            Comp.6     Comp.7
+## Standard deviation     0.72955099 0.57109700
+## Proportion of Variance 0.07755565 0.04752497
+## Cumulative Proportion  0.95247503 1.00000000
+## 
+## Loadings:
+##                     Comp.1 Comp.2 Comp.3 Comp.4 Comp.5 Comp.6 Comp.7
+## perc_speeding       -0.144 -0.467         0.691         0.519       
+## perc_alcohol        -0.305 -0.539  0.366         0.298 -0.605 -0.169
+## perc_not_distracted -0.144 -0.363 -0.574 -0.103 -0.659 -0.250 -0.106
+## perc_no_previous     0.242  0.381  0.323  0.541 -0.445 -0.431 -0.123
+## insurance_premiums   0.607 -0.367                      -0.154  0.687
+## losses               0.601 -0.278  0.188 -0.238         0.196 -0.652
+## num_drivers         -0.280         0.625 -0.401 -0.516  0.233  0.219</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
+<div id="the-data-was-first-prepared-by-grabbing-all-relevant-numerical-data-and-scaling-it.-next-i-ran-princomp-on-the-scaled-data-and-chose-2-principle-components-to-use-after-creating-a-plot-to-visualize-my-eigenvalues.-i-then-used-these-components-to-find-the-pc-scores-for-each-component-and-visualize-them-through-a-plot-of-loadings." class="section level5">
+<h5>The data was first prepared by grabbing all relevant numerical data and scaling it. Next, I ran <code>princomp()</code> on the scaled data and chose 2 principle components to use after creating a plot to visualize my eigenvalues. I then used these components to find the PC scores for each component and visualize them through a plot of loadings.</h5>
+<p><img src="/project1_files/figure-html/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="the-loading-plot-shows-that-insurance_premiums-and-losses-affect-pc1-greatly-while-perc_speeding-perc_alcohol-and-perc_not_distracted-affected-pc2-the-most.-num_drivers-negatively-affected-pc1-and-didnt-have-much-of-an-effect-on-pc2.-lastly-perc_no_previous-had-a-slight-effect-on-pc1-and-a-negative-effect-on-pc2." class="section level5">
+<h5>The loading plot shows that <code>insurance_premiums</code> and <code>losses</code> affect PC1 greatly, while <code>perc_speeding</code>, <code>perc_alcohol</code>, and <code>perc_not_distracted</code> affected PC2 the most. <code>num_drivers</code> negatively affected PC1 and didn’t have much of an effect on PC2. Lastly, <code>perc_no_previous</code> had a slight effect on PC1 and a negative effect on PC2.</h5>
+<hr />
+</div>
+</div>

@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1575573552002.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1911044848",
+    "id" : "1CEB3110",
+    "lastKnownWriteTime" : 1576441036,
+    "last_content_update" : 1576441036642,
+    "path" : "~/Desktop/anothersite/content/blog/2015-07-23-r-rmarkdown.Rmd",
+    "project_path" : "content/blog/2015-07-23-r-rmarkdown.Rmd",
+    "properties" : {
+        "cursorPosition" : "14,22",
+        "scrollLine" : "4"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
