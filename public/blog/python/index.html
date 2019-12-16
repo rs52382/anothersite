@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Raj Sharan" />
+    <meta name="description" content="Description">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <title>Python - REGEX</title>
+    <meta name="generator" content="Hugo 0.60.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/blog/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+        <li><a href="/resume.pdf">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="/blog/python/">Python - REGEX</a></strong>
+          </h3>
+        </div>
+        <div class="blog-title">
+          <h4>
+          December 15, 2019
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="regex" class="section level1">
+<h1>REGEX</h1>
+<div class="figure">
+<img src="Desktop/anothersite/static/img/snake.jpg" alt="snake" />
+<p class="caption">snake</p>
+</div>
+<p>When being introduced to Python during the last unit this semester, I found the use of regular expressions, or REGEX for short, to be amazingly efficient in use of large sets of data. I definitely appreciated becoming proficient in R, but learning some Python basics seemed like a breath of fresh air.</p>
+<p>During the second homework assignment was when I was really tested with my REGEX skills in Python. Using <code>re.findall</code> throughout the homework provided the epiphany that there was a plethora of possibilities that could be used with <code>re.findall</code> alone when analyzing strings of data. For example, the following question challenged me:</p>
+<p><em>Using <code>re.findall()</code>, match all latex math-mode text (anything wrapped in <code>$</code>, including the <code>$</code>s) in the string below (string4).</em></p>
+<p>I was stuck for a solid hour, but after a lot of trial and error, I was able to come up with the following code:</p>
+<pre class="python"><code>string4=r&quot;We try to quantitatively capture these characteristics by defining a set of indexes,\
+which can be computed using the mosaic image and the corresponding ground truth: \
+\begin{itemize} \
+    \item $\mu_{A_T}$ and $\sigma_{A_T}$, the mean and standard deviation of the tiles area $A_T$, respectively; \
+    \item $\rho_\text{filler}$, the ratio between the filler area and the overall mosaic are, computed as \
+$\rho_\text{filler}=\frac{\sum_{T \in \mathcal{T} A_T}}{A}$, being $A$ the area of the mosaic; \
+    \item \todo{does it worth?}; \
+    \item \todo{does it worth?}; \
+    \item $\mu_{C_T}$, the mean of the tiles \emph{color dispersion} $C_T$, \
+being $C_T = \sigma_R+\sigma_G+\sigma_B$, where $\sigma_R$, $\sigma_G$ and $\sigma_B$ are the \
+standard deviation of the red, green and blue channel values of the pixels within the tile $T$.\
+After applying a method to an image, we compare the segmented image (i.e., the result) \
+against the ground truth and assess the performance according to the following three metrics: \
+\begin{itemize} \
+    \item average tile precision $P$ \
+    \item average tile recall $R$ \
+    \item tile count error $C$&quot;
+
+import re
+re.findall(r&quot;\$[^$]+\$&quot;,string4)</code></pre>
+<pre><code>## [&#39;$\\mu_{A_T}$&#39;, &#39;$\\sigma_{A_T}$&#39;, &#39;$A_T$&#39;, &#39;$\\rho_\\text{filler}$&#39;, &#39;$\\rho_\\text{filler}=\\frac{\\sum_{T \\in \\mathcal{T} A_T}}{A}$&#39;, &#39;$A$&#39;, &#39;$\\mu_{C_T}$&#39;, &#39;$C_T$&#39;, &#39;$C_T = \\sigma_R+\\sigma_G+\\sigma_B$&#39;, &#39;$\\sigma_R$&#39;, &#39;$\\sigma_G$&#39;, &#39;$\\sigma_B$&#39;, &#39;$T$&#39;, &#39;$P$&#39;, &#39;$R$&#39;, &#39;$C$&#39;]</code></pre>
+<p>Although a short bit of code, the content in it is staggering in effect. The thing I’ve enjoyed about Python is how it’s a lot more logic based with a higher learning curve than R. Don’t get me wrong, I like R a lot: it creates a lot prettier plots and figures (thank you ggplot!), but learning both languages will definitely come of good use in my future.</p>
+</div>
+
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/js/docs.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

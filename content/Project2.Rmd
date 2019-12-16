@@ -1,0 +1,237 @@
+---
+title: "Project 2: Modeling, Testing, and Predicting"
+author: "Raj Sharan - rs52382"
+date: "11/26/2019"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+opts_chunk$set(fig.align="center", fig.height=5, fig.width=8)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(ggplot2)
+library(tibble)
+library(sandwich)
+library(plotROC)
+class_diag<-function(probs,truth){
+ tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+ acc=sum(diag(tab))/sum(tab)
+ sens=tab[2,2]/colSums(tab)[2]
+ spec=tab[1,1]/colSums(tab)[1]
+ ppv=tab[2,2]/rowSums(tab)[2]
+ if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+ ord<-order(probs, decreasing=TRUE)
+ probs <- probs[ord]; truth <- truth[ord]
+ TPR=cumsum(truth)/max(1,sum(truth))
+ FPR=cumsum(!truth)/max(1,sum(!truth))
+ dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+ TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+ n <- length(TPR)
+ auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+ data.frame(acc,sens,spec,ppv,auc)
+} 
+```
+
+---
+
+### 0. Introduction
+
+##### The dataset `channing` contains data on 462 seniors that, at some point in time, lived in the Channing House retirement home in Palo Alto, California. The data was collected from the opening of the house in 1964 until July 1, 1975. The `sex` variable accounts for the 97 men and 365 women that had passed through the retirement home. The `entry` variable accounts for each resident's age (in months) upon entry to the home. The `exit` variable accounts for each resident's age (in months) upon death, when they left the home prior to July 1, 1975, or if they were still living in the home on July 1, 1975 (whichever event came first). The `time` variable designates the amount of time (in months) that the resident stayed in the Channing House. The `died` binary variable designates a 1 if the senior died while staying at the Channing House and a 0 if they left the home prior to July 1, 1975 or were still living in the home at that time.
+
+---
+
+### 1. MANOVA
+
+##### The results of the MANOVA test were that significant differences were not found among the two sexes on the three dependent measures, Pillai trace = 0.011, pseudo F(3,458) = 1.78, p > 0.05. If the MANOVA test had resulted in a significant p-value, 3 ANOVA tests would've been performed for the 3 numeric response variables (`entry`, `exit`, and `time`) and no post-hoc t-tests would have to be performed due to the cateogorical `sex` variable only having 2 levels, meaning the ANOVA tests would already tell if there were differences between the two sexes. This would result in a total of 4 tests total, meaning the probability of at least one type I error (if unadjusted) would be 0.0125, which we would use as the new significance level according to the Bonferroni correction. The assumptions for conduction of a MANOVA are extremely strict and cannot be thought to have been met with the given data.
+
+```{R, echo=FALSE}
+library(readr)
+channing<-read_csv("channing.csv")
+man1<-manova(cbind(entry,exit,time)~sex,data=channing)
+summary(man1)
+```
+
+---
+
+### 2. Randomization Test
+
+##### A PERMANOVA test was performed (using the `adonis()` function and by hand) to see whether there was a difference in centroids and/or dispersion for age (in months) upon arrival to the Channing House, age (in months) upon death, when they left the home prior to July 1, 1975, or if they were still living in the home on July 1, 1975 (whichever event came first), and time spent alive in the Channing House (in months) between men (n = 97) and women (n = 365). 
+##### H0 : The centroids and dispersion of men and women as defined by the `entry`, `exit`, and `time` variables are equivalent. 
+##### HA : The centroids and/or dispersion of men and women as defined by the `entry`, `exit`, and `time` variables are different.
+
+```{R, echo=FALSE}
+dists<-channing%>%select(entry,exit,time)%>%dist()
+
+SST<-sum(dists^2)/462
+SSW<- channing %>%
+  group_by(sex) %>%
+  select(entry,exit,time) %>%
+  do(d=dist(.[2:3],"euclidean")) %>% 
+  ungroup() %>%
+  summarize(sum(d[[1]]^2)/365 + sum(d[[2]]^2)/97) %>% 
+  pull
+F_obs <- ((SST-SSW)/1)/(SSW/460)
+```
+```{R, echo=FALSE, message=FALSE}
+Fs <- replicate(1000,{
+new <- channing %>% mutate(sex=sample(sex))
+SSW <- new %>% group_by(sex) %>%
+  select(entry,exit,time) %>%
+  do(d=dist(.[2:3],"euclidean")) %>% 
+  ungroup() %>%
+  summarize(sum(d[[1]]^2)/365 + sum(d[[2]]^2)/97) %>%
+  pull
+((SST-SSW)/1)/(SSW/460)
+})
+```
+```{R, echo=FALSE}
+{hist(Fs,prob = T); abline(v=F_obs, col="red", add=T)}
+```
+
+##### The results of the PERMANOVA test showed no significant difference in the centroids or dispersion of men and women as defined by the `entry`, `exit`, and `time` variables (F[1,460] = 2.16, p-value > 0.05) and we therefore fail to reject the null hypothesis.
+
+---
+
+### 3. Linear Regression Model
+
+##### A linear regression model for the prediction of time spent alive (in months) at the Channing House was created from the use of the `entry` variable and `sex` variable, as well as their interaction. For seniors with an average age of entry to the Channing House, women stay in the Channing House while alive for 81.56 months, on average. For seniors with an average age of entry to the Channing House, men have a stay at the Channing House that is 5.68 months shorter than women, on average. For women, every 1 month increase in the average age upon entry to the Channing House decreases their stay at the Channing House while alive by an average of 0.17 months. For men, every 1 month increase in the average age upon entry to the Channing House decreases their stay at the Channing House while alive by an average of 0.015 months less than that of women.
+##### The assumptions for linearity and homoskedasticity can be found to have been violated based on the residual plot displayed below. The normality assumption is also violated based on the bimodal residual histogram and sigmoidal curve of the residual Q-Q plot.
+##### After recomputing regression results with robust standard errors, the standard errors of all four coefficients slightly decreased and the p-values for the intercept and the centered `entry` variable remained significant with both having p-values < 0.0001. Overall, the model explains 6.1% of the variation in time spent alive in the Channing House.
+
+```{R, echo=FALSE}
+channing$entry_c <- channing$entry - mean(channing$entry)
+fit<-lm(time ~ sex * entry_c, data=channing)
+summary(fit)
+
+qplot(x = entry, y = time, color = sex, data = channing) +
+ stat_smooth(method = "lm", se = FALSE, fullrange = TRUE) +
+  ylab("Months Lived in Channing House") +
+  xlab("Age in Months Upon Entry to Channing House") +
+  ggtitle("Interaction Plot of Sex and Entry Age on Time Spent in Channing House")
+
+resids<-fit$residuals
+fitvals<-fit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color='red') +
+  ggtitle("Residual Plot")
+ggplot()+geom_histogram(aes(resids), bins=20) +
+  ggtitle("Residual Histogram")
+ggplot()+geom_qq(aes(sample=resids)) +
+  ggtitle("Residual Q-Q Plot")
+```
+
+---
+
+### 4. Bootstrapped SEs
+
+##### The bootstrapped SEs were found to be larger than those of the robust SEs and therefore larger than the original SEs (the robust SEs were larger than the originals). The p-values slightly increased for the intercept and `entry_c` variable, but both remained significant (p-value < 0.0001 and p-value < 0.001, respectively). The interaction between sex and entry age was found to also be significant under the bootstrapped SEs, with a p-value < 0.05.
+
+```{R, echo=FALSE}
+boot_dat<-channing[sample(nrow(channing),replace=TRUE),]
+samp_distn<-replicate(5000, {
+ boot_dat<-channing[sample(nrow(channing),replace=TRUE),]
+ fit2<-lm(time ~ sex * entry_c,data=boot_dat)
+ coef(fit2)
+})
+fit2<-lm(time ~ sex * entry_c,data=boot_dat)
+summary(fit2)
+```
+
+---
+
+### 5. Logistic Regression Model
+
+##### A logistic regression model was created to predict the binary categorical variable of `died` from `sex` and `entry_c`. For females with an average age of entry to the Channing House, the odds of dying in the Channing House is 0.55. For males with an average age of entry to the Channing House, the odds of dying in the Channing House is 0.82. For females, every 1 month increase in the age of entry to the Channing House multiplies the odds of dying in the Channing House by 1.01.
+##### Using a confusion matrix created for the logistic regression, the Accuracy, Sensitivity (TPR), Specificity (TNR), and Precision (PPV) can be calculated for the model. The proportion of correctly classified deaths (Accuracy) is 0.64. The True Positive Rate (TPR) of the model is 0.27. The True Negative Rate (TNR) of the model is 0.87. Lastly, the Precision (PPV) of the model is 0.56.
+
+```{R, echo=FALSE}
+fit3<-glm(died~sex + entry_c,data=channing,family=binomial(link="logit"))
+
+channing$prob<-predict(fit3,type="response")
+table(predict=as.numeric(channing$prob>.5),truth=channing$died)%>%addmargins()
+
+exp(-0.6025009)
+exp(-0.6025009+0.4020886)
+exp(0.0075471)
+
+(248+48)/462 # Accuracy
+48/176 # Sensitivity (TPR)
+248/286 # Specificity (TNR)
+48/86 # Precision (PPV)
+
+channing$logit<-predict(fit3)
+channing$status<-ifelse(channing$died==0,"Alive","Dead")
+
+channing%>%ggplot()+geom_density(aes(logit,color=status,fill=status), alpha=.4)+
+  theme(legend.position=c(.85,.85))+geom_vline(xintercept=0)+xlab("predictor (logit)")+
+  ggtitle("Logit Density Plot")
+
+tpr<-function(p)mean(channing[channing$died==1,]$prob>p)
+fpr<-function(p)mean(channing[channing$died==0,]$prob>p)
+channing<-channing[order(channing$prob),]
+prob<-channing$prob
+cuts<-unique(c(0,(prob[-1]+prob[-32])/2,1))
+TPR<-sapply(cuts,tpr)
+FPR<-sapply(cuts,fpr)
+ROC1<-
+ data.frame(cuts,TPR,FPR,TP=TPR*13,FP=FPR*19)%>%
+ arrange(desc(cuts))
+
+ROCplot<-ggplot(channing)+geom_roc(aes(d=died,m=prob), n.cuts=0)+ggtitle("ROC Curve")+
+  geom_segment(aes(x=0,xend=1,y=0,yend=1),lty=2)
+ROCplot
+calc_auc(ROCplot)
+```
+
+##### The calculated AUC for the ROC curve was 0.65 and is therefore classified as a poor AUC. The probability that a randomly selected senior who has died in the Channing House has a slightly higher prediction than a randomly selected senior who has not died in the Channing House.
+
+```{R, echo=FALSE}
+set.seed(1234)
+k=10
+data1<-channing[sample(nrow(channing)),]
+folds<-cut(seq(1:nrow(channing)),breaks=k,labels=F)
+diags<-NULL
+for(i in 1:k){
+ train<-data1[folds!=i,]
+ test<-data1[folds==i,]
+ truth<-test$died
+ fit4<-glm(died~entry_c,data=channing,family="binomial")
+ probs<-predict(fit4,newdata = test,type="response")
+ diags<-rbind(diags,class_diag(probs,truth))
+}
+apply(diags,2,mean) 
+```
+
+##### After performing a 10-fold CV on the data, the results show that the average out-of-sample Accuracy, Sensitivity, and Recall were 0.65, 0.25, and 0.88, respectively.
+
+---
+
+### 6. LASSO Regression
+
+##### After running a LASSO regression on the `died` variable and choosing lambda to give the simplest model whose accuracy is near that of the best, the `entry` and `time` variables are retained. Using this model with the retained variables, a 10-fold CV was performed, resulting in a CV prediciton error (MSE) of 0.26. This is a much better value than that of the model's out-of-sample accuracy of 0.65.
+
+```{R, echo=FALSE}
+channing2<-read_csv("channing.csv")
+fit5<-lm(died~.,data=channing2)
+yhat<-predict(fit5)
+mean((channing2$died-yhat)^2)
+y<-as.matrix(channing2$died)
+x<-channing2%>%dplyr::select(-died,-sex)%>%mutate_all(scale)%>%as.matrix
+
+set.seed(1234)
+k=10 
+data2<-channing2[sample(nrow(channing2)),]
+folds2<-cut(seq(1:nrow(channing2)),breaks=k,labels=F)
+diags2<-NULL
+for(i in 1:k){
+ train2<-data2[folds2!=i,]
+ test2<-data2[folds2==i,]
+ fit6<-lm(died~entry+time,data=train2)
+ yhat<-predict(fit6,newdata=test)
+ diags2<-mean((test$died-yhat)^2)
+}
+mean(diags2)
+```
+
+---

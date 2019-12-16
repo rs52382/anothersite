@@ -1,0 +1,166 @@
+---
+title: "Project 2: Modeling, Testing, and Predicting"
+author: "Raj Sharan - rs52382"
+date: "11/26/2019"
+output: html_document
+---
+
+
+
+<hr />
+<div id="introduction" class="section level3">
+<h3>0. Introduction</h3>
+<div id="the-dataset-channing-contains-data-on-462-seniors-that-at-some-point-in-time-lived-in-the-channing-house-retirement-home-in-palo-alto-california.-the-data-was-collected-from-the-opening-of-the-house-in-1964-until-july-1-1975.-the-sex-variable-accounts-for-the-97-men-and-365-women-that-had-passed-through-the-retirement-home.-the-entry-variable-accounts-for-each-residents-age-in-months-upon-entry-to-the-home.-the-exit-variable-accounts-for-each-residents-age-in-months-upon-death-when-they-left-the-home-prior-to-july-1-1975-or-if-they-were-still-living-in-the-home-on-july-1-1975-whichever-event-came-first.-the-time-variable-designates-the-amount-of-time-in-months-that-the-resident-stayed-in-the-channing-house.-the-died-binary-variable-designates-a-1-if-the-senior-died-while-staying-at-the-channing-house-and-a-0-if-they-left-the-home-prior-to-july-1-1975-or-were-still-living-in-the-home-at-that-time." class="section level5">
+<h5>The dataset <code>channing</code> contains data on 462 seniors that, at some point in time, lived in the Channing House retirement home in Palo Alto, California. The data was collected from the opening of the house in 1964 until July 1, 1975. The <code>sex</code> variable accounts for the 97 men and 365 women that had passed through the retirement home. The <code>entry</code> variable accounts for each resident’s age (in months) upon entry to the home. The <code>exit</code> variable accounts for each resident’s age (in months) upon death, when they left the home prior to July 1, 1975, or if they were still living in the home on July 1, 1975 (whichever event came first). The <code>time</code> variable designates the amount of time (in months) that the resident stayed in the Channing House. The <code>died</code> binary variable designates a 1 if the senior died while staying at the Channing House and a 0 if they left the home prior to July 1, 1975 or were still living in the home at that time.</h5>
+<hr />
+</div>
+</div>
+<div id="manova" class="section level3">
+<h3>1. MANOVA</h3>
+<div id="the-results-of-the-manova-test-were-that-significant-differences-were-not-found-among-the-two-sexes-on-the-three-dependent-measures-pillai-trace-0.011-pseudo-f3458-1.78-p-0.05.-if-the-manova-test-had-resulted-in-a-significant-p-value-3-anova-tests-wouldve-been-performed-for-the-3-numeric-response-variables-entry-exit-and-time-and-no-post-hoc-t-tests-would-have-to-be-performed-due-to-the-cateogorical-sex-variable-only-having-2-levels-meaning-the-anova-tests-would-already-tell-if-there-were-differences-between-the-two-sexes.-this-would-result-in-a-total-of-4-tests-total-meaning-the-probability-of-at-least-one-type-i-error-if-unadjusted-would-be-0.0125-which-we-would-use-as-the-new-significance-level-according-to-the-bonferroni-correction.-the-assumptions-for-conduction-of-a-manova-are-extremely-strict-and-cannot-be-thought-to-have-been-met-with-the-given-data." class="section level5">
+<h5>The results of the MANOVA test were that significant differences were not found among the two sexes on the three dependent measures, Pillai trace = 0.011, pseudo F(3,458) = 1.78, p &gt; 0.05. If the MANOVA test had resulted in a significant p-value, 3 ANOVA tests would’ve been performed for the 3 numeric response variables (<code>entry</code>, <code>exit</code>, and <code>time</code>) and no post-hoc t-tests would have to be performed due to the cateogorical <code>sex</code> variable only having 2 levels, meaning the ANOVA tests would already tell if there were differences between the two sexes. This would result in a total of 4 tests total, meaning the probability of at least one type I error (if unadjusted) would be 0.0125, which we would use as the new significance level according to the Bonferroni correction. The assumptions for conduction of a MANOVA are extremely strict and cannot be thought to have been met with the given data.</h5>
+<pre><code>## Parsed with column specification:
+## cols(
+##   sex = col_character(),
+##   entry = col_integer(),
+##   exit = col_integer(),
+##   time = col_integer(),
+##   died = col_integer()
+## )</code></pre>
+<pre><code>##            Df  Pillai approx F num Df den Df Pr(&gt;F)
+## sex         1 0.01139   1.7588      3    458 0.1542
+## Residuals 460</code></pre>
+<hr />
+</div>
+</div>
+<div id="randomization-test" class="section level3">
+<h3>2. Randomization Test</h3>
+<div id="a-permanova-test-was-performed-using-the-adonis-function-and-by-hand-to-see-whether-there-was-a-difference-in-centroids-andor-dispersion-for-age-in-months-upon-arrival-to-the-channing-house-age-in-months-upon-death-when-they-left-the-home-prior-to-july-1-1975-or-if-they-were-still-living-in-the-home-on-july-1-1975-whichever-event-came-first-and-time-spent-alive-in-the-channing-house-in-months-between-men-n-97-and-women-n-365." class="section level5">
+<h5>A PERMANOVA test was performed (using the <code>adonis()</code> function and by hand) to see whether there was a difference in centroids and/or dispersion for age (in months) upon arrival to the Channing House, age (in months) upon death, when they left the home prior to July 1, 1975, or if they were still living in the home on July 1, 1975 (whichever event came first), and time spent alive in the Channing House (in months) between men (n = 97) and women (n = 365).</h5>
+</div>
+<div id="h0-the-centroids-and-dispersion-of-men-and-women-as-defined-by-the-entry-exit-and-time-variables-are-equivalent." class="section level5">
+<h5>H0 : The centroids and dispersion of men and women as defined by the <code>entry</code>, <code>exit</code>, and <code>time</code> variables are equivalent.</h5>
+</div>
+<div id="ha-the-centroids-andor-dispersion-of-men-and-women-as-defined-by-the-entry-exit-and-time-variables-are-different." class="section level5">
+<h5>HA : The centroids and/or dispersion of men and women as defined by the <code>entry</code>, <code>exit</code>, and <code>time</code> variables are different.</h5>
+<pre><code>## Adding missing grouping variables: `sex`</code></pre>
+<pre><code>## Warning in int_abline(a = a, b = b, h = h, v = v, untf = untf, ...): &quot;add&quot; is
+## not a graphical parameter</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="the-results-of-the-permanova-test-showed-no-significant-difference-in-the-centroids-or-dispersion-of-men-and-women-as-defined-by-the-entry-exit-and-time-variables-f1460-2.16-p-value-0.05-and-we-therefore-fail-to-reject-the-null-hypothesis." class="section level5">
+<h5>The results of the PERMANOVA test showed no significant difference in the centroids or dispersion of men and women as defined by the <code>entry</code>, <code>exit</code>, and <code>time</code> variables (F[1,460] = 2.16, p-value &gt; 0.05) and we therefore fail to reject the null hypothesis.</h5>
+<hr />
+</div>
+</div>
+<div id="linear-regression-model" class="section level3">
+<h3>3. Linear Regression Model</h3>
+<div id="a-linear-regression-model-for-the-prediction-of-time-spent-alive-in-months-at-the-channing-house-was-created-from-the-use-of-the-entry-variable-and-sex-variable-as-well-as-their-interaction.-for-seniors-with-an-average-age-of-entry-to-the-channing-house-women-stay-in-the-channing-house-while-alive-for-81.56-months-on-average.-for-seniors-with-an-average-age-of-entry-to-the-channing-house-men-have-a-stay-at-the-channing-house-that-is-5.68-months-shorter-than-women-on-average.-for-women-every-1-month-increase-in-the-average-age-upon-entry-to-the-channing-house-decreases-their-stay-at-the-channing-house-while-alive-by-an-average-of-0.17-months.-for-men-every-1-month-increase-in-the-average-age-upon-entry-to-the-channing-house-decreases-their-stay-at-the-channing-house-while-alive-by-an-average-of-0.015-months-less-than-that-of-women." class="section level5">
+<h5>A linear regression model for the prediction of time spent alive (in months) at the Channing House was created from the use of the <code>entry</code> variable and <code>sex</code> variable, as well as their interaction. For seniors with an average age of entry to the Channing House, women stay in the Channing House while alive for 81.56 months, on average. For seniors with an average age of entry to the Channing House, men have a stay at the Channing House that is 5.68 months shorter than women, on average. For women, every 1 month increase in the average age upon entry to the Channing House decreases their stay at the Channing House while alive by an average of 0.17 months. For men, every 1 month increase in the average age upon entry to the Channing House decreases their stay at the Channing House while alive by an average of 0.015 months less than that of women.</h5>
+</div>
+<div id="the-assumptions-for-linearity-and-homoskedasticity-can-be-found-to-have-been-violated-based-on-the-residual-plot-displayed-below.-the-normality-assumption-is-also-violated-based-on-the-bimodal-residual-histogram-and-sigmoidal-curve-of-the-residual-q-q-plot." class="section level5">
+<h5>The assumptions for linearity and homoskedasticity can be found to have been violated based on the residual plot displayed below. The normality assumption is also violated based on the bimodal residual histogram and sigmoidal curve of the residual Q-Q plot.</h5>
+</div>
+<div id="after-recomputing-regression-results-with-robust-standard-errors-the-standard-errors-of-all-four-coefficients-slightly-decreased-and-the-p-values-for-the-intercept-and-the-centered-entry-variable-remained-significant-with-both-having-p-values-0.0001.-overall-the-model-explains-6.1-of-the-variation-in-time-spent-alive-in-the-channing-house." class="section level5">
+<h5>After recomputing regression results with robust standard errors, the standard errors of all four coefficients slightly decreased and the p-values for the intercept and the centered <code>entry</code> variable remained significant with both having p-values &lt; 0.0001. Overall, the model explains 6.1% of the variation in time spent alive in the Channing House.</h5>
+<pre><code>## 
+## Call:
+## lm(formula = time ~ sex * entry_c, data = channing)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -96.693 -39.542  -0.225  43.958  83.495 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     81.56488    2.45111  33.277  &lt; 2e-16 ***
+## sexMale         -5.67526    5.40453  -1.050    0.294    
+## entry_c         -0.17097    0.03584  -4.770 2.48e-06 ***
+## sexMale:entry_c -0.01495    0.07560  -0.198    0.843    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 46.78 on 458 degrees of freedom
+## Multiple R-squared:  0.06733,    Adjusted R-squared:  0.06123 
+## F-statistic: 11.02 on 3 and 458 DF,  p-value: 5.333e-07</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;" /><img src="/Project2_files/figure-html/unnamed-chunk-5-2.png" width="768" style="display: block; margin: auto;" /><img src="/Project2_files/figure-html/unnamed-chunk-5-3.png" width="768" style="display: block; margin: auto;" /><img src="/Project2_files/figure-html/unnamed-chunk-5-4.png" width="768" style="display: block; margin: auto;" /></p>
+<hr />
+</div>
+</div>
+<div id="bootstrapped-ses" class="section level3">
+<h3>4. Bootstrapped SEs</h3>
+<div id="the-bootstrapped-ses-were-found-to-be-larger-than-those-of-the-robust-ses-and-therefore-larger-than-the-original-ses-the-robust-ses-were-larger-than-the-originals.-the-p-values-slightly-increased-for-the-intercept-and-entry_c-variable-but-both-remained-significant-p-value-0.0001-and-p-value-0.001-respectively.-the-interaction-between-sex-and-entry-age-was-found-to-also-be-significant-under-the-bootstrapped-ses-with-a-p-value-0.05." class="section level5">
+<h5>The bootstrapped SEs were found to be larger than those of the robust SEs and therefore larger than the original SEs (the robust SEs were larger than the originals). The p-values slightly increased for the intercept and <code>entry_c</code> variable, but both remained significant (p-value &lt; 0.0001 and p-value &lt; 0.001, respectively). The interaction between sex and entry age was found to also be significant under the bootstrapped SEs, with a p-value &lt; 0.05.</h5>
+<pre><code>## 
+## Call:
+## lm(formula = time ~ sex * entry_c, data = boot_dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -96.229 -36.895  -4.873  41.925  92.505 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     79.71231    2.33473  34.142  &lt; 2e-16 ***
+## sexMale         -4.26252    5.37023  -0.794    0.428    
+## entry_c         -0.18338    0.03306  -5.547 4.91e-08 ***
+## sexMale:entry_c -0.09772    0.07227  -1.352    0.177    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 44.96 on 458 degrees of freedom
+## Multiple R-squared:  0.1032, Adjusted R-squared:  0.09729 
+## F-statistic: 17.56 on 3 and 458 DF,  p-value: 8.305e-11</code></pre>
+<hr />
+</div>
+</div>
+<div id="logistic-regression-model" class="section level3">
+<h3>5. Logistic Regression Model</h3>
+<div id="a-logistic-regression-model-was-created-to-predict-the-binary-categorical-variable-of-died-from-sex-and-entry_c.-for-females-with-an-average-age-of-entry-to-the-channing-house-the-odds-of-dying-in-the-channing-house-is-0.55.-for-males-with-an-average-age-of-entry-to-the-channing-house-the-odds-of-dying-in-the-channing-house-is-0.82.-for-females-every-1-month-increase-in-the-age-of-entry-to-the-channing-house-multiplies-the-odds-of-dying-in-the-channing-house-by-1.01." class="section level5">
+<h5>A logistic regression model was created to predict the binary categorical variable of <code>died</code> from <code>sex</code> and <code>entry_c</code>. For females with an average age of entry to the Channing House, the odds of dying in the Channing House is 0.55. For males with an average age of entry to the Channing House, the odds of dying in the Channing House is 0.82. For females, every 1 month increase in the age of entry to the Channing House multiplies the odds of dying in the Channing House by 1.01.</h5>
+</div>
+<div id="using-a-confusion-matrix-created-for-the-logistic-regression-the-accuracy-sensitivity-tpr-specificity-tnr-and-precision-ppv-can-be-calculated-for-the-model.-the-proportion-of-correctly-classified-deaths-accuracy-is-0.64.-the-true-positive-rate-tpr-of-the-model-is-0.27.-the-true-negative-rate-tnr-of-the-model-is-0.87.-lastly-the-precision-ppv-of-the-model-is-0.56." class="section level5">
+<h5>Using a confusion matrix created for the logistic regression, the Accuracy, Sensitivity (TPR), Specificity (TNR), and Precision (PPV) can be calculated for the model. The proportion of correctly classified deaths (Accuracy) is 0.64. The True Positive Rate (TPR) of the model is 0.27. The True Negative Rate (TNR) of the model is 0.87. Lastly, the Precision (PPV) of the model is 0.56.</h5>
+<pre><code>##        truth
+## predict   0   1 Sum
+##     0   248 128 376
+##     1    38  48  86
+##     Sum 286 176 462</code></pre>
+<pre><code>## [1] 0.5474408</code></pre>
+<pre><code>## [1] 0.8183933</code></pre>
+<pre><code>## [1] 1.007576</code></pre>
+<pre><code>## [1] 0.6406926</code></pre>
+<pre><code>## [1] 0.2727273</code></pre>
+<pre><code>## [1] 0.8671329</code></pre>
+<pre><code>## [1] 0.5581395</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;" /><img src="/Project2_files/figure-html/unnamed-chunk-7-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre><code>##   PANEL group       AUC
+## 1     1    -1 0.6508463</code></pre>
+</div>
+<div id="the-calculated-auc-for-the-roc-curve-was-0.65-and-is-therefore-classified-as-a-poor-auc.-the-probability-that-a-randomly-selected-senior-who-has-died-in-the-channing-house-has-a-slightly-higher-prediction-than-a-randomly-selected-senior-who-has-not-died-in-the-channing-house." class="section level5">
+<h5>The calculated AUC for the ROC curve was 0.65 and is therefore classified as a poor AUC. The probability that a randomly selected senior who has died in the Channing House has a slightly higher prediction than a randomly selected senior who has not died in the Channing House.</h5>
+<pre><code>##       acc      sens      spec       ppv       auc 
+## 0.6451434 0.2544246 0.8819808 0.5938997 0.6419663</code></pre>
+</div>
+<div id="after-performing-a-10-fold-cv-on-the-data-the-results-show-that-the-average-out-of-sample-accuracy-sensitivity-and-recall-were-0.65-0.25-and-0.88-respectively." class="section level5">
+<h5>After performing a 10-fold CV on the data, the results show that the average out-of-sample Accuracy, Sensitivity, and Recall were 0.65, 0.25, and 0.88, respectively.</h5>
+<hr />
+</div>
+</div>
+<div id="lasso-regression" class="section level3">
+<h3>6. LASSO Regression</h3>
+<div id="after-running-a-lasso-regression-on-the-died-variable-and-choosing-lambda-to-give-the-simplest-model-whose-accuracy-is-near-that-of-the-best-the-entry-and-time-variables-are-retained.-using-this-model-with-the-retained-variables-a-10-fold-cv-was-performed-resulting-in-a-cv-prediciton-error-mse-of-0.26.-this-is-a-much-better-value-than-that-of-the-models-out-of-sample-accuracy-of-0.65." class="section level5">
+<h5>After running a LASSO regression on the <code>died</code> variable and choosing lambda to give the simplest model whose accuracy is near that of the best, the <code>entry</code> and <code>time</code> variables are retained. Using this model with the retained variables, a 10-fold CV was performed, resulting in a CV prediciton error (MSE) of 0.26. This is a much better value than that of the model’s out-of-sample accuracy of 0.65.</h5>
+<pre><code>## Parsed with column specification:
+## cols(
+##   sex = col_character(),
+##   entry = col_integer(),
+##   exit = col_integer(),
+##   time = col_integer(),
+##   died = col_integer()
+## )</code></pre>
+<pre><code>## [1] 0.2151545</code></pre>
+<pre><code>## [1] 0.2595422</code></pre>
+<hr />
+</div>
+</div>
