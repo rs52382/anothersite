@@ -8,9 +8,9 @@ tags: []
 description: ''
 ---
 
-# REGEX
+![](/blog/2019-12-15-hello_files/snake.jpg)
 
-![snake](Desktop/anothersite/static/img/snake.jpg)
+# REGEX
 
 When being introduced to Python during the last unit this semester, I found the use of regular expressions, or REGEX for short, to be amazingly efficient in use of large sets of data. I definitely appreciated becoming proficient in R, but learning some Python basics seemed like a breath of fresh air.
 
